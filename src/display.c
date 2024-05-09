@@ -54,6 +54,8 @@ static int frame_times_index = 0;
 static uint32_t frame_times_duration;
 /** @brief Auto detected TV region for display */
 static uint32_t __tv_type;
+/** @brief Whether to use 60Hz PAL or 50Hz PAL */
+static bool use_pal60 = false;
 
 /** @brief Get the next buffer index (with wraparound) */
 static inline int buffer_next(int idx) {
@@ -107,6 +109,11 @@ static void __display_callback()
     }
 }
 
+void display_set_pal60( bool enable )
+{
+    use_pal60 = enable;
+}
+
 void display_init( resolution_t res, bitdepth_t bit, uint32_t num_buffers, gamma_t gamma, filter_options_t filters )
 {
     __tv_type = get_tv_type();
@@ -124,6 +131,19 @@ void display_init( resolution_t res, bitdepth_t bit, uint32_t num_buffers, gamma
 
     /* Copy over extra initializations */
     vi_write_config(&vi_config_presets[serrate][__tv_type]);
+    if (__tv_type == TV_PAL && use_pal60)
+    {
+        /* 60Hz PAL is a regular PAL video mode with NTSC-like V_SYNC and V_VIDEO */
+
+        /* NOTE: Ideally V_SYNC would be 524/525, matching NTSC, however in practice this appears
+                 to cause too-slow retrace intervals. Instead we use 518/519 half-lines which is
+                 only a 1.14% deviation, the expectation is that this is within the tolerance ranges
+                 of almost all devices.
+                 Alternatively we could have elected to shorten H_SYNC, however H_SYNC is expected
+                 to be less tolerant than V_SYNC so we opt to leave it alone at the nominal value. */
+        *VI_V_SYNC = VI_V_SYNC_SET(525 - 6 - serrate);
+        *VI_V_VIDEO = (serrate) ? VI_V_VIDEO_SET(35, 509) : VI_V_VIDEO_SET(37, 511);
+    }
 
     /* Figure out control register based on input given */
     switch( bit )

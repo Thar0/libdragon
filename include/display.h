@@ -181,6 +181,18 @@ extern "C" {
 #endif
 
 /**
+ * @brief Set whether to use 60Hz PAL on a PAL system
+ *
+ * This setting does not affect NTSC and MPAL display.  The default is false.
+ *
+ * @param[in] enable
+ *            If true, use 60Hz PAL. Otherwise, use 50Hz PAL.
+ *
+ * @note This must be called before display_init
+ */
+void display_set_pal60( bool enable );
+
+/**
  * @brief Initialize the display to a particular resolution and bit depth
  *
  * Initialize video system.  This sets up a double, triple, or multiple
