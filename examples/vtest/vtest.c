@@ -17,6 +17,7 @@ int main(void)
     int res = 0;
 
     /* Initialize peripherals */
+    display_set_pal60( true );
     display_init( RESOLUTION_320x240, DEPTH_32_BPP, 2, GAMMA_NONE, FILTERS_RESAMPLE );
 
     joypad_init();

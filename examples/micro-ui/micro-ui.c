@@ -218,6 +218,7 @@ int main(void)
     
     joypad_init();
     dfs_init(DFS_DEFAULT_LOCATION);
+    display_set_pal60(true);
     display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE_ANTIALIAS_DEDITHER);
     rdpq_init();
     gl_init();
